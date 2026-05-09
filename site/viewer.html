@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMAG — Interactive viewer</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+<header>
+  <h1>EMAG — EEG Mixture-of-4D-Gaussians</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="viewer.html" class="active">Interactive viewer</a>
+    <a href="https://github.com/AlexLazarovich/EMAG">GitHub</a>
+  </nav>
+</header>
+
+<main class="viewer">
+  <p class="muted">Top: 3D scene of the learned 4D Gaussians (size ∝ σ<sub>xyz</sub>, color ∝ amplitude, opacity ∝ activation at <em>t</em>). Bottom: HD topomap of the ground truth and EMAG reconstruction at <em>t</em>.</p>
+
+  <div class="controls">
+    <span><label>Source</label><select id="source"></select></span>
+    <span><label>Top K</label><input id="topk" type="number" min="1" max="100000" step="1" value="500" style="width:90px;"></span>
+    <span><label>Speed (ms/frame)</label>
+      <input id="speed" type="number" min="1" max="500" step="1" value="40" style="width:80px;">
+    </span>
+    <span><label>σ-scale</label><input id="sigma" type="number" min="0.1" max="5" step="0.1" value="1.0" style="width:70px;"></span>
+    <span><label>opacity</label><input id="ellopacity" type="number" min="0.05" max="1" step="0.05" value="0.55" style="width:70px;"></span>
+    <span><label><input id="clip" type="checkbox" checked> Clip to head</label></span>
+    <span><label><input id="sphere" type="checkbox" checked> Show sphere</label></span>
+    <button id="play" class="primary">▶  Play</button>
+    <button id="reset">Reset</button>
+    <span class="stats" id="meta"></span>
+  </div>
+
+  <div class="timeline">
+    <span class="muted">t</span>
+    <input id="t" type="range" min="0" max="100" step="1" value="0">
+    <span class="t-label" id="t-label">0 / 0  (0.000s)</span>
+  </div>
+
+  <div class="plot-row plot-row-3">
+    <div class="plot"><h3>3D — learned mixtures</h3>          <div id="plot3d"    style="height: 460px;"></div></div>
+    <div class="plot"><h3>HD ground truth — topomap</h3>      <div id="plot-gt"   style="height: 460px;"></div></div>
+    <div class="plot"><h3>EMAG reconstruction — topomap</h3>  <div id="plot-pred" style="height: 460px;"></div></div>
+  </div>
+
+  <div class="stats" id="diag"></div>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

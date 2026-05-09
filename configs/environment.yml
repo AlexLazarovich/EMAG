@@ -1,0 +1,29 @@
+name: emag
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib
+  - pyyaml
+  - tqdm
+  - mne
+  - jupyterlab
+  - ipykernel
+  - nbformat
+  - pytorch::pytorch=2.5.1
+  - pytorch::torchvision=0.20.1
+  - pytorch::torchaudio=2.5.1
+  - pytorch::pytorch-cuda=12.4
+  - pip:
+      - plotly
+      - streamlit
+      - seaborn
+      - pypdf
+      - tensorboard

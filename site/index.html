@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMAG — EEG Mixture-of-4D-Gaussians</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+<header>
+  <h1>EMAG — EEG Mixture-of-4D-Gaussians</h1>
+  <nav>
+    <a href="index.html" class="active">Home</a>
+    <a href="viewer.html">Interactive viewer</a>
+    <a href="https://github.com/AlexLazarovich/EMAG">GitHub</a>
+  </nav>
+</header>
+
+<main>
+  <p>Camera-ready reference implementation of <strong>EMAG</strong>, a spatio-temporal mixture-of-4D-Gaussians model for EEG super-resolution (low-density&nbsp;→&nbsp;high-density electrode arrays).</p>
+
+  <div class="fig"><img src="../assets/concept_figure.png" alt="EMAG concept"></div>
+
+  <p>At each brain grid location the source field is represented by <code>G</code> 4D Gaussians (3 space + 1 time) with a learnable full 4D precision (Cholesky-parameterized). A fixed or learned forward operator projects the latent field to the electrode space.</p>
+
+  <h2>Source validation</h2>
+  <p>Most EEG models can only be evaluated at the scalp — the underlying neural sources are unknown. The <a href="https://openneuro.org/datasets/ds004562">Localize-MI</a> dataset solves this: epileptic patients implanted with stereo-EEG (sEEG) depth electrodes received single-pulse intracerebral electrical stimulation (SPES) at known cortical sites, while a 256-channel scalp HD-EEG cap recorded the evoked response. The stimulating contact gives a millimetre-accurate ground-truth dipole — a rare opportunity to check whether a learned source-space model places its sources where the brain actually generated them.</p>
+  <p>We feed EMAG the low-density scalp signal and recover the implied cortical activity. The figures below show, at the time of the stimulation peak:</p>
+  <ul>
+    <li><strong>2D topomap</strong> — scalp projection of the ground-truth HD recording vs. EMAG's reconstruction from the LD montage. Spatial topography is preserved, including the polarity inversion above the stimulation site.</li>
+    <li><strong>3D volumetric</strong> — EMAG's learned 4D Gaussians overlaid on the cortical mesh, with the true stimulating contact marked. The most active mixtures cluster around the contact, not at the scalp maximum, recovering the source-vs.-sensor distinction that linear interpolators cannot.</li>
+  </ul>
+  <div class="fig"><img src="../assets/source_validation_2d.png" alt="2D source validation (topomap)"></div>
+  <div class="fig"><img src="../assets/source_validation_3d.png" alt="3D source validation"></div>
+
+  <h2>Reconstruction quality</h2>
+  <p>Across Localize-MI (high-SNR evoked) and SEED / SEED-IV (resting/affective EEG), EMAG outperforms spline, neural-network and diffusion baselines on RMSE, SNR and structural-similarity metrics. The example below shows ground-truth, baseline and EMAG topographies at a single sample: EMAG preserves both local extrema and the global spatial gradient that linear interpolators smear out.</p>
+  <div class="fig"><img src="../assets/topo_recon_example.png" alt="Topographic reconstruction example"></div>
+
+  <h2>Electrode-subset super-resolution</h2>
+  <p>A practical question: which low-density montage best supports SR to a full HD cap? We benchmark EMAG on a family of named subsets (10-20, frontal-only, occipital-only, sparse-grid, …) at matched cardinality. Frontal-heavy and uniformly-spread subsets are strongly favoured; clustered occipital-only subsets degrade reconstruction even when the held-out HD targets are away from the cluster.</p>
+  <div class="fig"><img src="../assets/electrode_subsets_layout.png" alt="Electrode-subset montages"></div>
+  <div class="fig"><img src="../assets/electrode_subsets_metrics.png" alt="Electrode-subset SR fidelity"></div>
+
+  <h2>Cross-subject generalization</h2>
+  <p>Beyond the per-subject regime, we fit EMAG on N−1 subjects and evaluate on the held-out one. The heatmaps show pairwise train-subject / test-subject reconstruction fidelity: diagonal-light, off-diagonal-dark patterns indicate that learned 4D Gaussian fields are largely subject-specific, while broader off-diagonal mass marks transferable structure within a dataset.</p>
+  <div class="fig"><img src="../assets/crosssubj_heatmaps.png" alt="Cross-subject reconstruction heatmaps"></div>
+
+  <h2>Interactive viewer</h2>
+  <p>A live, in-browser viewer of the learned 4D Gaussians: pick a dataset / subject / SR factor, scrub through time or hit play to watch the spatio-temporal Gaussians activate.</p>
+  <p><a href="viewer.html"><strong>→ Launch the viewer</strong></a></p>
+
+  <h2>Repo layout</h2>
+<pre><code>EMAG/
+├── src/
+│   ├── models/{base.py, model.py}
+│   ├── data/{eeg_constellations, channel_subsets, ld_interpolation,
+│   │         leadfield_io, localize_mi/seed/seed_iv dataloaders}
+│   ├── training/train.py     # single-subject SR training entry point
+│   └── eval/visualize_subject.py
+├── scripts/build_site_data.py  # pre-render a ckpt → JSON for the viewer
+├── site/                        # this site (GitHub Pages source)
+├── assets/                      # figures shown above
+├── configs/environment.yml
+└── README.md</code></pre>
+
+  <h2>Install</h2>
+<pre><code>conda env create -f configs/environment.yml
+conda activate emag</code></pre>
+
+  <h2>Train</h2>
+  <p>Single-subject SR run (Localize-MI, SR factor 4):</p>
+<pre><code>PYTHONPATH=src python src/training/train.py \
+    --dataset localize_mi --subject sub-01 --sr_factor 4 --epochs 100 \
+    --data_root /path/to/Localize-MI/derivatives/epochs \
+    --results_dir ./results --checkpoint_dir ./checkpoints</code></pre>
+  <p>SEED / SEED-IV:</p>
+<pre><code>PYTHONPATH=src python src/training/train.py --dataset seed    --subject 1 --sr_factor 4 \
+    --data_root /path/to/SEED    --results_dir ./results --checkpoint_dir ./checkpoints
+PYTHONPATH=src python src/training/train.py --dataset seed_iv --subject 1 --sr_factor 4 \
+    --data_root /path/to/SEED-IV --results_dir ./results --checkpoint_dir ./checkpoints</code></pre>
+  <p>Useful flags: <code>--n_gaussians_per_point</code>, <code>--grid_type {cube,sphere}</code>, <code>--n_grid</code>, <code>--ld_conditioning {none,global,per_grid}</code>, <code>--forward_operator {free,leadfield_matrix}</code>. See <code>train.py --help</code> for the full list.</p>
+
+  <h2>Inference / Visualization</h2>
+<pre><code>PYTHONPATH=src python src/eval/visualize_subject.py \
+    --checkpoint checkpoints/&lt;run_name&gt;/&lt;subject&gt;.pt \
+    --dataset localize_mi --subject sub-01 \
+    --data_root /path/to/Localize-MI/derivatives/epochs \
+    --time_idx 1234 --out viz.png</code></pre>
+
+  <h2>Citation</h2>
+<pre><code>@article{lazarovich2026emag,
+  title={EMAG: Differentiable 4D Gaussian Mixture Splatting for EEG Spatial Super-Resolution},
+  author={Lazarovich, Alex and Shahar, Ofir Itzhak and Elkin, Gur and Ben-Shahar, Ohad},
+  journal={arXiv preprint arXiv:2605.29731},
+  year={2026}
+}</code></pre>
+</main>
+</body>
+</html>

@@ -1,0 +1,90 @@
+[
+  {
+    "file": "localize-mi_sub-01_sr16.json",
+    "id": "localize-mi_sub-01_sr16",
+    "label": "localize_mi / sub-01 / SR\u00d716",
+    "dataset": "localize_mi",
+    "subject": "sub-01",
+    "sr_factor": 16,
+    "n_gaussians": 1500,
+    "n_time": 521,
+    "sampling_rate": 8000.0
+  },
+  {
+    "file": "localize-mi_sub-01_sr2.json",
+    "id": "localize-mi_sub-01_sr2",
+    "label": "localize_mi / sub-01 / SR\u00d72",
+    "dataset": "localize_mi",
+    "subject": "sub-01",
+    "sr_factor": 2,
+    "n_gaussians": 1500,
+    "n_time": 521,
+    "sampling_rate": 8000.0
+  },
+  {
+    "file": "localize-mi_sub-01_sr4.json",
+    "id": "localize-mi_sub-01_sr4",
+    "label": "localize_mi / sub-01 / SR\u00d74",
+    "dataset": "localize_mi",
+    "subject": "sub-01",
+    "sr_factor": 4,
+    "n_gaussians": 1500,
+    "n_time": 521,
+    "sampling_rate": 8000.0
+  },
+  {
+    "file": "localize-mi_sub-01_sr8.json",
+    "id": "localize-mi_sub-01_sr8",
+    "label": "localize_mi / sub-01 / SR\u00d78",
+    "dataset": "localize_mi",
+    "subject": "sub-01",
+    "sr_factor": 8,
+    "n_gaussians": 1500,
+    "n_time": 521,
+    "sampling_rate": 8000.0
+  },
+  {
+    "file": "seed-iv_sub-1_sr2.json",
+    "id": "seed-iv_sub-1_sr2",
+    "label": "seed_iv / 1 / SR\u00d72",
+    "dataset": "seed_iv",
+    "subject": "1",
+    "sr_factor": 2,
+    "n_gaussians": 1500,
+    "n_time": 100,
+    "sampling_rate": 200.0
+  },
+  {
+    "file": "seed-iv_sub-1_sr4.json",
+    "id": "seed-iv_sub-1_sr4",
+    "label": "seed_iv / 1 / SR\u00d74",
+    "dataset": "seed_iv",
+    "subject": "1",
+    "sr_factor": 4,
+    "n_gaussians": 1500,
+    "n_time": 100,
+    "sampling_rate": 200.0
+  },
+  {
+    "file": "seed-iv_sub-1_sr8.json",
+    "id": "seed-iv_sub-1_sr8",
+    "label": "seed_iv / 1 / SR\u00d78",
+    "dataset": "seed_iv",
+    "subject": "1",
+    "sr_factor": 8,
+    "n_gaussians": 1500,
+    "n_time": 100,
+    "sampling_rate": 200.0
+  },
+  {
+    "file": "seed_sub-1_sr2.json",
+    "id": "seed_sub-1_sr2",
+    "label": "seed / 1 / SR\u00d72",
+    "dataset": "seed",
+    "subject": "1",
+    "sr_factor": 2,
+    "n_gaussians": 1500,
+    "n_time": 100,
+    "sampling_rate": 200.0
+  }
+]
